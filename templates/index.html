@@ -1,74 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Chatbot</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Medical Chatbot</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body.light-mode {
+      background-color: #f0f2f5;
+    }
+
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100%;
+    }
+
+    .chat-header {
+      background-color: #3380ff;
+      color: white;
+      padding: 15px 25px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .bot-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .bot-avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+    }
+
+    .chat-header h3 {
+      margin: 0;
+    }
+
+    .chat-header p {
+      font-size: 0.9em;
+      margin: 3px 0 0 0;
+    }
+
+    .toggle-btn {
+      background: transparent;
+      color: white;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .chat-box {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background-color: #e5eaf0;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    body.dark-mode .chat-box {
+      background-color: #1e1e1e;
+    }
+
+    .message {
+      max-width: 75%;
+      padding: 12px 18px;
+      border-radius: 15px;
+      font-size: 16px;
+      line-height: 1.5;
+      word-wrap: break-word;
+      position: relative;
+    }
+
+    .user-message {
+      align-self: flex-end;
+      background-color: #9ec5ef;
+      color: #000;
+    }
+
+    body.dark-mode .user-message {
+      background-color: #386faa;
+      color: white;
+    }
+
+    .bot-message {
+      align-self: flex-start;
+      background-color: #fff;
+      color: #000;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark-mode .bot-message {
+      background-color: #333;
+      color: #e0e0e0;
+    }
+
+    .chat-input-container {
+      display: flex;
+      padding: 15px 20px;
+      background-color: #fff;
+      border-top: 1px solid #ccc;
+    }
+
+    body.dark-mode .chat-input-container {
+      background-color: #1e1e1e;
+      border-top: 1px solid #333;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 12px 15px;
+      font-size: 16px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      outline: none;
+      background-color: white;
+      color: black;
+    }
+
+    body.dark-mode #user-input {
+      background-color: #333;
+      color: white;
+      border: 1px solid #555;
+    }
+
+    #send-btn {
+      margin-left: 10px;
+      padding: 0 18px;
+      font-size: 18px;
+      background-color: #48d0f2;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    #send-btn:hover {
+      background-color: #007bff;
+    }
+
+    .chat-box::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chat-box::-webkit-scrollbar-thumb {
+      background-color: #bbb;
+      border-radius: 3px;
+    }
+
+    body.dark-mode .chat-box::-webkit-scrollbar-thumb {
+      background-color: #444;
+    }
+  </style>
 </head>
-<body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <div class="bot-info">
-                <img src="https://cdn-icons-png.flaticon.com/512/387/387569.png" class="bot-avatar">
-                <div>
-                    <h3>Medical Chatbot</h3>
-                    <p>Ask me anything about health!</p>
-                </div>
-            </div>
+<body class="light-mode">
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="bot-info">
+        <img src="{{ url_for('static', filename='Image.jpg') }}" alt="Image" height="50px" width="50px" border-radius="30px">
+        <div>
+          <h3>Medical Chatbot</h3>
+          <p>Ask me anything about health!</p>
         </div>
-        <div class="chat-box" id="chat-box">
-            <div class="bot-message">Hello! How can I assist you today?</div>
-        </div>
-        <div class="chat-input-container">
-            <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off">
-            <button id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
-        </div>
+      </div>
+      <button class="toggle-btn" id="theme-toggle" title="Toggle Dark Mode">
+        🌙
+      </button>
     </div>
 
-    <script>
-        document.getElementById("send-btn").addEventListener("click", sendMessage);
-        document.getElementById("user-input").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                sendMessage();
-            }
-        });
+    <div class="chat-box" id="chat-box"></div>
 
-        function sendMessage() {
-            const userInput = document.getElementById("user-input").value.trim();
-            const chatBox = document.getElementById("chat-box");
+    <div class="chat-input-container">
+      <input type="text" id="user-input" placeholder="Type your message..." />
+      <button id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+  </div>
 
-            if (userInput === "") return;
+  <script>
+    // Set up theme toggle
+    const themeToggle = document.getElementById("theme-toggle");
+    const body = document.body;
 
-            const date = new Date();
-            const time = date.getHours() + ":" + (date.getMinutes() < 10 ? "0" : "") + date.getMinutes();
+    themeToggle.addEventListener("click", () => {
+      body.classList.toggle("dark-mode");
+      body.classList.toggle("light-mode");
+      themeToggle.textContent = body.classList.contains("dark-mode") ? "☀" : "🌙";
+    });
 
-            const userMessage = `<div class="message user-message">
-                                    <span>${userInput}</span>
-                                    <small class="timestamp">${time}</small>
-                                </div>`;
-            chatBox.innerHTML += userMessage;
-            document.getElementById("user-input").value = "";
+    // Add first bot message dynamically
+    window.onload = () => {
+      const chatBox = document.getElementById("chat-box");
+      const initialBotMessage = `
+        <div class="message bot-message">
+          <span>Hello! How can I assist you today?</span>
+        </div>`;
+      chatBox.innerHTML += initialBotMessage;
+    };
+
+    // Chat functionality
+    document.getElementById("send-btn").addEventListener("click", sendMessage);
+    document.getElementById("user-input").addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    });
+
+    function sendMessage() {
+      const userInput = document.getElementById("user-input").value.trim();
+      const chatBox = document.getElementById("chat-box");
+
+      if (userInput === "") return;
+
+      const userMessage = `
+        <div class="message user-message">
+          <span>${userInput}</span>
+        </div>`;
+      chatBox.innerHTML += userMessage;
+      document.getElementById("user-input").value = "";
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      setTimeout(() => {
+        fetch("/get", {
+          method: "POST",
+          body: new URLSearchParams({ msg: userInput }),
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        })
+          .then((response) => response.text())
+          .then((data) => {
+            const botMessage = `
+              <div class="message bot-message">
+                <span>${data}</span>
+              </div>`;
+            chatBox.innerHTML += botMessage;
             chatBox.scrollTop = chatBox.scrollHeight;
-
-            setTimeout(() => {
-                fetch("/get", {
-                    method: "POST",
-                    body: new URLSearchParams({ "msg": userInput }),
-                    headers: { "Content-Type": "application/x-www-form-urlencoded" }
-                })
-                .then(response => response.text())
-                .then(data => {
-                    const botMessage = `<div class="message bot-message">
-                                            <span>${data}</span>
-                                            <small class="timestamp">${time}</small>
-                                        </div>`;
-                    chatBox.innerHTML += botMessage;
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                });
-            }, 500);
-        }
-    </script>
+          });
+      }, 600);
+    }
+  </script>
 </body>
 </html>

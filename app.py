@@ -45,22 +45,20 @@ def generate_response(query, retrieved_docs):
 
     # Create conversation history
     messages = [
-        {
-            "role": "system",
-            "content":  "You are a highly intelligent and interactive medical assistant. Use the provided context to give smart, helpful, and accurate responses." 
-                        "Always be clear, concise, and conversational—like ChatGPT. "
+    {
+        "role": "system",
+        "content": (
+            "You are a highly intelligent and interactive medical assistant. Use the provided context to give smart, helpful, and accurate responses.\n\n"
+            "- Always be clear, concise, and conversational—like ChatGPT.\n"
+            "- Before answering, ask 2–3 brief and relevant follow-up questions to gather key details (e.g., symptoms, duration, age, severity, medical history).\n"
+            "- Once the user responds, provide a direct and informative answer using the most relevant details from the context. Include helpful suggestions when possible, such as home remedies, over-the-counter options, or next steps.\n"
+            "- Use a natural tone. Don’t apologize or give long disclaimers. Don’t mention you’re an AI. Focus on helping the user efficiently.\n"
+            "- Use short, digestible paragraphs or bullet points. If something sounds potentially serious, calmly suggest seeing a doctor.\n"
+            "- If the question is not related to the provided medical context, simply respond with “I don’t know.” Do not search online."
+        )
+    }
+]
 
-                        "If the question is clear and answerable, respond directly using the most relevant details from the context. Include brief suggestions if helpful, such as over-the-counter remedies or next steps."
-
-                        "If the question is vague or incomplete, ask a simple follow-up question to gather key details (e.g., symptoms, duration, age)."
-
-                        "Use a natural tone. Do not apologize or give long disclaimers. Do not mention you're an AI. Focus on helping the user efficiently."
-
-                        "Use short, digestible paragraphs or bullet points when appropriate. If something is potentially serious, calmly suggest seeing a doctor."
-
-
-        }
-    ]
 
     # Append chat history to maintain memory
     messages.extend(chat_history)
@@ -103,4 +101,6 @@ def chat():
     return response
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Render ka PORT use karo
+    app.run(host='0.0.0.0', port=port)
+    
